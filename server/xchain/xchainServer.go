@@ -162,16 +162,20 @@ func handleReceivedMsg(ctx context.Context, msg *p2p.XuperMessage) (*p2p.XuperMe
 
 // StartXchainProxyServer 开启服务
 func StartXchainProxyServer(quit chan int) {
+	log, err := logs.NewLogger("xchainProxyServer")
+	if err != nil {
+		return
+	}
 	// start server
 	lis, err := net.Listen("tcp", config.GetXchainServer().Port)
-	log, err := logs.NewLogger("xchainProxyServer")
-
 	if err != nil {
+		log.Error("XchainProxyServer.StartXchainProxyServer: failed to listen", "err", err)
 		return
 	}
 	proxy := xchainProxyServer{
 		log: log,
 	}
+
 	if config.GetXchainServer().Master != "" {
 		proxy.groups = make(map[string]*clixchain.GroupClient)
 	}
